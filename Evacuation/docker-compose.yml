@@ -1,0 +1,45 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  frontend:
+    build: ./Frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - frontend
+  backend:
+    build: ./Backend
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=development
+      - MONGO_DB_CONNECTION_STRING=mongodb://database:27017
+      - MONGO_DB_NAME=evac
+      - REDIS_URI=redis://:secret@redis:6379
+    depends_on:
+      - database
+      - redis
+    networks:
+      - frontend
+      - backend
+  database:
+    build: ./Database
+    ports:
+      - "27017:27017"
+    networks:
+      - backend
+  redis:
+    build: ./Redis
+    ports:
+      - "6397:6397"
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+  frontend:
+    driver: bridge
+      
